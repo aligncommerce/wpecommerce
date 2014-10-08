@@ -1,8 +1,3 @@
-wpecommerce
-===========
-
-The Align Commerce payment gateway for WP-eCommerce will allow you to accept payments on your WP-eCommerce installation in the form of local currency via bank transfers and/or via Bitcoin
-
 ==== Align Commerce Payment Gateway for WP-eCommerce ====
 
 Plugin Name: WP-eCommerce - Align Commerce Payment Gateway
@@ -20,7 +15,7 @@ The Align Commerce payment gateway for WP-eCommerce will allow you to accept pay
 
 1. Download the plugin zip file.
 2. Login to your WordPress Admin. Click on Plugins | Add New from the left hand menu.
-3. Click on the ‚ÄúUpload‚Äù option, then click ‚ÄúChoose File‚Äù to select the zip file from your computer. Once selected, press ‚ÄúOK‚Äù and press the "Install Now" button.
+3. Click on the ìUploadî option, then click ìChoose Fileî to select the zip file from your computer. Once selected, press ìOKî and press the "Install Now" button.
 4. Activate the plugin.
 5. Open the settings page for WP-eCommerce and click the "Payments," tab.
 6. Configure your settings.
