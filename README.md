@@ -2,7 +2,7 @@
 - Plugin Name: WP-eCommerce - Align Commerce Payment Gateway
 - Plugin URI:
   * https://aligncommerce.com/docs/libraries-plugins-ecommerce-websites/#plugins-wordpressecommerce
-- Version: 1.0.0
+- Version: 1.0.0 
 - Author: Align Commerce Corporation
 - Author URI: https://aligncommerce.com
 - License: GPLv2
