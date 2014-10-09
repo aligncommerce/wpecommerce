@@ -14,12 +14,18 @@ The Align Commerce payment gateway for WP-eCommerce will allow you to accept pay
 == Installation ==
 
 Getting Started:
-You will need to generate your API keys - https://aligncommerce.com/dashboard/keys 
+You will need to generate your API keys - https://aligncommerce.com/dashboard/keys.
+After generating the API keys, you need to set the IPN and Return Urls.
+
+Set your return URL and IPN URL to the following format. 
+Return URL: http://yoursite.com/products-page/transaction-results/?acBankCallback=1
+IPN URL: http://yoursite.com
+
 You will also need your Align Commerce dashboard email and password on your plugin settings
 
 1. Download the plugin zip file.
 2. Login to your WordPress Admin. Click on Plugins | Add New from the left hand menu.
-3. Click on the ìUploadî option, then click ìChoose Fileî to select the zip file from your computer. Once selected, press ìOKî and press the "Install Now" button.
+3. Click on the ‚ÄúUpload‚Äù option, then click ‚ÄúChoose File‚Äù to select the zip file from your computer. Once selected, press ‚ÄúOK‚Äù and press the "Install Now" button.
 4. Activate the plugin.
 5. Open the settings page for WP-eCommerce and click the "Payments," tab.
 6. Configure your settings.
