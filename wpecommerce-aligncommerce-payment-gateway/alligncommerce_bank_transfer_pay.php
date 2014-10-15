@@ -172,19 +172,48 @@ function checkout_acbanck($seperator, $sessionid)
    
     $productAry=array();
     $i=0;
+  
+   $shipping_total=$purchase_log['base_shipping'];
     foreach ( $wpsc_cart->cart_items as $item ) {
-        if($i==0){$shipping_total=$purchase_log['base_shipping'];}
+      /*  if($i==0){$shipping_total=$purchase_log['base_shipping'];}
         else
-        {$shipping_total=0;}
+        {$shipping_total=0;}*/
+         $shipping_total=$shipping_total+$item->shipping;
         $productAry[]=array(
                 'product_name' => $item->product_name,
                 'product_price' => $item->unit_price ,
                 'quantity' => $item->quantity,
-                'product_shipping' => $shipping_total);
+                'product_shipping' => 0);
                 $i++;
       
     }
-
+    if($shipping_total>0)
+    {
+        $productAry[]= array(
+                    'product_name' => 'Total Shipping',
+                    'product_price' => 0,
+                    'quantity' => 1,
+                    'product_shipping' => round($shipping_total,2));
+    }
+     $tax=round($item->cart->total_tax,2);
+    if($tax>0)
+        {
+        $productAry[]= array(
+                    'product_name' => 'Tax Amount',
+                    'product_price' => $tax,
+                    'quantity' => 1,
+                    'product_shipping' => 0);
+        }
+    $discount=round($wpsc_cart->coupons_amount,2);
+     if($discount>0)
+        {
+        $productAry[]= array(
+                    'product_name' => 'Discount',
+                    'product_price' => -($discount),
+                    'quantity' => 1,
+                    'product_shipping' => 0);
+        }
+    
       $store_currency_data = WPSC_Countries::get_currency_data( get_option( 'currency_type' ), true );
       $cur_code=($store_currency_data['code']);  
      $invoice_post =  array(
@@ -311,7 +340,7 @@ function nzshpcrt_acBankpay_callback($sessionid)
      global $wpdb;
      $acBankObj=new wpsc_merchant_acbankpay();
     $acResponse=$_POST; 
-     
+    // $acResponse=array('checkout_type'=>'btc','status'=>'success','order_id'=>'142');
                       
     if(isset($_GET['acBankCallback']) && $_GET['acBankCallback']==1)
     { 
@@ -332,8 +361,8 @@ function nzshpcrt_acBankpay_callback($sessionid)
                 'date'       => time(),
             );
             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
-            transaction_results($sessionid, false, $acResponse['order_id']);
-           // $acBankObj->go_to_transaction_results($sessionid);
+            //transaction_results($sessionid, false, $acResponse['order_id']);
+            //$acBankObj->go_to_transaction_results($sessionid);
             break;
             
             case 'fail': // if it fails, delete it
@@ -343,20 +372,27 @@ function nzshpcrt_acBankpay_callback($sessionid)
                 'date'       => time(),
             );
             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
-            transaction_results($sessionid, false, $acResponse['order_id']);
-           // $acBankObj->go_to_transaction_results($sessionid);
+            //transaction_results($sessionid, false, $acResponse['order_id']);
+            //$acBankObj->go_to_transaction_results($sessionid);
             break;
             
              case 'cancel':      // need to wait for "Completed" before processing
             $wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
-           // $acBankObj->go_to_transaction_results($sessionid);
+            //$acBankObj->go_to_transaction_results($sessionid);
             break;
             
         } 
         
-        $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
+        if($acResponse['status']=='success')
+        {
+            $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
+        }
+        else
+        {
+            $transaction_url_with_sessionid =  get_option( 'transact_url' );
+        }
         echo $transaction_url_with_sessionid;
-       // echo $acBankObj->go_to_transaction_results($sessionid);
+       
         exit;
     }
     if($acResponse['checkout_type']=='btc')
@@ -392,12 +428,20 @@ function nzshpcrt_acBankpay_callback($sessionid)
             break;
             
         }
-        $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
+        if($acResponse['status']=='success')
+        {
+            $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
+        }
+        else
+        {
+            $transaction_url_with_sessionid =  get_option( 'transact_url' );
+        }
         echo $transaction_url_with_sessionid;
+       // wp_redirect($transaction_url_with_sessionid);
         exit;
     }
         
-         
+    exit;     
     }
 }
 
