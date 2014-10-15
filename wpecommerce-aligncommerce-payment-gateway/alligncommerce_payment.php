@@ -10,6 +10,7 @@ License: GPLv2
 */
 
 //register_activation_hook(__FILE__, "aligncom_payment_create");
+//bitcoin
 
 /**clear data when uninstall plugin******************/
 register_uninstall_hook(    __FILE__, 'uninstall_ac_paymentGateways' );
