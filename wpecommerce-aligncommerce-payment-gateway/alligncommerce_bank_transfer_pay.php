@@ -340,7 +340,7 @@ function nzshpcrt_acBankpay_callback($sessionid)
      global $wpdb;
      $acBankObj=new wpsc_merchant_acbankpay();
     $acResponse=$_POST; 
-    // $acResponse=array('checkout_type'=>'btc','status'=>'success','order_id'=>'142');
+     //$acResponse=array('checkout_type'=>'btc','status'=>'cancel','order_id'=>'164');
                       
     if(isset($_GET['acBankCallback']) && $_GET['acBankCallback']==1)
     { 
@@ -351,53 +351,14 @@ function nzshpcrt_acBankpay_callback($sessionid)
             $sessionid=$purchase_log['sessionid']; 
     if($acResponse['checkout_type']=='bank_transfer')
     { 
-         
-        switch($acResponse['status'])
-        {
-            case 'success':
-            $data = array(
-                'processed'  => 2,
-                'transactid' => $acResponse['order_id'],
-                'date'       => time(),
-            );
-            wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
-            //transaction_results($sessionid, false, $acResponse['order_id']);
-            //$acBankObj->go_to_transaction_results($sessionid);
-            break;
-            
-            case 'fail': // if it fails, delete it
-            $data = array(
-                'processed'  => 6,
-                'transactid' => $acResponse['order_id'],
-                'date'       => time(),
-            );
-            wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
-            //transaction_results($sessionid, false, $acResponse['order_id']);
-            //$acBankObj->go_to_transaction_results($sessionid);
-            break;
-            
-             case 'cancel':      // need to wait for "Completed" before processing
-            $wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
-            //$acBankObj->go_to_transaction_results($sessionid);
-            break;
-            
-        } 
-        
-        if($acResponse['status']=='success')
-        {
-            $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
-        }
-        else
-        {
-            $transaction_url_with_sessionid =  get_option( 'transact_url' );
-        }
-        echo $transaction_url_with_sessionid;
-       
-        exit;
-    }
-    if($acResponse['checkout_type']=='btc')
-    {
-         
+         /*
+         1-Incomplete Sale
+         2-Order Received
+         3-Accepted Payment
+         4-Job Dispatched
+         5-Closed Order
+         6-Payment Declined
+         */
         switch($acResponse['status'])
         {
             case 'success':
@@ -407,28 +368,137 @@ function nzshpcrt_acBankpay_callback($sessionid)
                 'date'       => time(),
             );
             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+             delete_post_meta($order_id, 'ac_fail_message');             
             //transaction_results($sessionid, false, $acResponse['order_id']);
             //$acBankObj->go_to_transaction_results($sessionid);
             break;
             
-            case 'fail': // if it fails, delete it
-              $data = array(
+            case 'fail': 
+            $data = array(
                 'processed'  => 6,
                 'transactid' => $acResponse['order_id'],
                 'date'       => time(),
             );
             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+            update_post_meta($acResponse['order_id'], 'ac_fail_message',$acResponse['status_message']);
+            break;
+            
+            case 'processing':
+            $data = array(
+                'processed'  => 1,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' ); 
+              delete_post_meta($order_id, 'ac_fail_message');
+            //$wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
+            break;
+            
+            case 'refund': 
+            $data = array(
+                'processed'  => 5,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+            wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+             delete_post_meta($order_id, 'ac_fail_message');
+            break;
+            
+            case 'cancel':      // need to wait for "Completed" before processing
+            $data = array(
+                'processed'  => 1,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+             update_post_meta($acResponse['order_id'], 'ac_fail_message', $acResponse['status_message']);
+            //$wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
+            break;
+            
+        }
+        
+        if($acResponse['status']=='success' || $acResponse['status']=='processing' || $acResponse['status']=='refund')
+        {
+            $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
+        }
+        else
+        {
+            $transaction_url_with_sessionid =  get_option( 'transact_url' );
+        }
+        echo $transaction_url_with_sessionid;
+       // echo add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
+       
+        exit;
+    }
+    if($acResponse['checkout_type']=='btc')
+    {
+         
+        /*
+         1-Incomplete Sale
+         2-Order Received
+         3-Accepted Payment
+         4-Job Dispatched
+         5-Closed Order
+         6-Payment Declined
+         */
+        switch($acResponse['status'])
+        {
+            case 'success':
+            $data = array(
+                'processed'  => 3,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+            wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+             delete_post_meta($order_id, 'ac_fail_message');             
             //transaction_results($sessionid, false, $acResponse['order_id']);
             //$acBankObj->go_to_transaction_results($sessionid);
             break;
             
-             case 'cancel':      // need to wait for "Completed" before processing
-            $wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
-            //$acBankObj->go_to_transaction_results($sessionid);
+            case 'fail': 
+            $data = array(
+                'processed'  => 6,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+            wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+            update_post_meta($acResponse['order_id'], 'ac_fail_message',$acResponse['status_message']);
+            break;
+            
+            case 'processing':
+            $data = array(
+                'processed'  => 1,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' ); 
+              delete_post_meta($order_id, 'ac_fail_message');
+            //$wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
+            break;
+            
+            case 'refund': 
+            $data = array(
+                'processed'  => 5,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+            wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+             delete_post_meta($order_id, 'ac_fail_message');
+            break;
+            
+            case 'cancel':      // need to wait for "Completed" before processing
+            $data = array(
+                'processed'  => 1,
+                'transactid' => $acResponse['order_id'],
+                'date'       => time(),
+            );
+             wpsc_update_purchase_log_details( $sessionid, $data, 'sessionid' );
+             update_post_meta($acResponse['order_id'], 'ac_fail_message', $acResponse['status_message']);
+            //$wpdb->update( WPSC_TABLE_PURCHASE_LOGS, array( 'transactid' => $acResponse['order_id'], 'date' => time() ), array( 'sessionid' => $sessionid ), array( '%d', '%s' ) );
             break;
             
         }
-        if($acResponse['status']=='success')
+        if($acResponse['status']=='success' || $acResponse['status']=='processing' || $acResponse['status']=='refund')
         {
             $transaction_url_with_sessionid = add_query_arg( 'sessionid', $sessionid, get_option( 'transact_url' ) );
         }
@@ -483,5 +553,36 @@ function availablityCheckACBankPay()
     </script>
 <?php }
 
+add_action('wpsc_user_log_after_order_status','show_ac_order_status_message');
+function show_ac_order_status_message($purchase)
+{
+    
+   $post_id=$purchase['id'];
+    $ac_fail_msg=get_post_meta( $post_id, 'ac_fail_message' );
+    if($ac_fail_msg)
+    {
+        echo '<p class="order-info"><b>'.__('Order Note','woocommerce').' : </b> '.$ac_fail_msg[0].'<p>';
+    }
+}
 
+add_action('wpsc_shipping_details_bottom','admin_ac_status');
+function admin_ac_status()
+{
+    
+   $post_id=$_REQUEST['id'];
+    $ac_fail_msg=get_post_meta( $post_id, 'ac_fail_message' );
+    if($ac_fail_msg)
+    {
+        ?>
+        <div class="metabox-holder">
+                <div class="postbox" id="purchlogs_notes">
+                    <h3 class="hndle"><?php echo __('Order Status Note','wpsc');?></h3>
+                    <div class="inside">
+                     <?php echo $ac_fail_msg[0];?>   
+                    </div>
+                </div>
+            </div>
+            <?php 
+    } 
+}
 ?>
