@@ -12,8 +12,8 @@ License: GPLv2
 //register_activation_hook(__FILE__, "aligncom_payment_create");
 
 /**clear data when uninstall plugin******************/
-register_uninstall_hook(    __FILE__, 'uninstall_ac_paymentGateways' );
-function uninstall_ac_paymentGateways()
+register_uninstall_hook(    __FILE__, 'uninstall_ac_paymentGateways_ecommerce' );
+function uninstall_ac_paymentGateways_ecommerce()
 {
     delete_option('acBtc_al_country');
     delete_option('acBtc_description');
@@ -281,18 +281,48 @@ function checkout_acBctpay($seperator, $sessionid)
     //debugbreak();
     $productAry=array();
     $i=0;
+      //debugbreak();
+    $shipping_total=$purchase_log['base_shipping'];
     foreach ( $wpsc_cart->cart_items as $item ) {
-        if($i==0){$shipping_total=$purchase_log['base_shipping'];}
+      /*  if($i==0){$shipping_total=$purchase_log['base_shipping'];}
         else
-        {$shipping_total=0;}
+        {$shipping_total=0;}*/
+        $shipping_total=$shipping_total+$item->shipping;
         $productAry[]=array(
                 'product_name' => $item->product_name,
                 'product_price' => $item->unit_price ,
                 'quantity' => $item->quantity,
-                'product_shipping' => $shipping_total);
+                'product_shipping' => 0);
                 $i++;
       
     }
+    if($shipping_total>0)
+    {
+        $productAry[]= array(
+                    'product_name' => 'Total Shipping',
+                    'product_price' => 0,
+                    'quantity' => 1,
+                    'product_shipping' => round($shipping_total,2));
+    }
+    $tax=round($item->cart->total_tax,2);
+    if($tax>0)
+        {
+        $productAry[]= array(
+                    'product_name' => 'Tax Amount',
+                    'product_price' => $tax,
+                    'quantity' => 1,
+                    'product_shipping' => 0);
+        }
+    $discount=round($wpsc_cart->coupons_amount,2);
+     if($discount>0)
+        {
+        $productAry[]= array(
+                    'product_name' => 'Discount',
+                    'product_price' => -($discount),
+                    'quantity' => 1,
+                    'product_shipping' => 0);
+        }
+
 
       $store_currency_data = WPSC_Countries::get_currency_data( get_option( 'currency_type' ), true );
       $cur_code=($store_currency_data['code']);  
@@ -343,7 +373,7 @@ function checkout_acBctpay($seperator, $sessionid)
 }
 
 /***recieve response from gateway***********/
-add_action('init', 'nzshpcrt_acBitcoinPay_callback');
+//add_action('init', 'nzshpcrt_acBitcoinPay_callback');
 function nzshpcrt_acBitcoinPay_callback1()
 {
    
