@@ -1,14 +1,14 @@
 <?php
 /*
-Bank transfer Allign commerce payment gateway
+Bank Transfer / Payin Local Align Commerce Payment Gateway
 **/
  $val=time();
 $nzshpcrt_gateways[$val] = array(
-    'name' => __( 'Aligncommerce Bank Transfer Payment', 'wpsc' ),
+    'name' => __( 'Align Commerce Bank Transfer Payment', 'wpsc' ),
     'api_version' => 1.1,
     'class_name' => 'wpsc_merchant_acbankpay',
     'has_recurring_billing' => true,
-    'display_name' => __( 'Aligncommerce Bank Transfer Payment', 'wpsc' ),
+    'display_name' => __( 'Align Commerce Bank Transfer Payment', 'wpsc' ),
     'wp_admin_cannot_cancel' => false,
     'form' => 'form_acBankpay',
     'submit_function'=>'submit_acBank',
@@ -27,7 +27,7 @@ class wpsc_merchant_acbankpay extends wpsc_merchant {
         
     function __construct( $purchase_id = null, $is_receiving = false ) {
        // debugbreak();
-        $this->name = __( 'Aligncommerce Bank Transfer Payment', 'wpsc' );
+        $this->name = __( 'Align Commerce Bank Transfer Payment', 'wpsc' );
          $this->currency_url='https://api.aligncommerce.com/currency';
         parent::__construct( $purchase_id, $is_receiving );
         global $wpsc_gateways;
@@ -279,7 +279,7 @@ function form_acBankpay() {
     if(get_option('ac_currency_id_bank')=='')
     {
        $output.='   <tr valign="top">
-            <th colspan="2">'.__( 'Gateway Disabled : Aligncommerce Bank Transfer does not support your store currency OR you entered wrong credentials.', 'wpsc' ).'</th>
+            <th colspan="2">'.__( 'Gateway Disabled : Align Commerce Bank Transfer does not support your store currency OR you entered wrong credentials.', 'wpsc' ).'</th>
            </tr>'; 
            
     }
@@ -292,21 +292,21 @@ function form_acBankpay() {
              </td>
         </tr>
         <tr valign="top">
-            <th ><label for="acBank_api_key">'.__( 'Alligncommerce API key', 'wpsc' ).'</label></th>
+            <th ><label for="acBank_api_key">'.__( 'Align Commerce API key', 'wpsc' ).'</label></th>
             <td ><input type="text" placeholder="" value="'.( get_option( 'acBank_api_key' ) ).'" style="" id="wpsc_options[acBank_api_key]" name="wpsc_options[acBank_api_key]" ></td>
         </tr>
                 <tr valign="top">
-            <th ><label for="acBank_api_secret">'.__( 'Alligncommerce API Secret', 'wpsc' ).'</label></th>
+            <th ><label for="acBank_api_secret">'.__( 'Align Commerce API Secret', 'wpsc' ).'</label></th>
             <td ><input type="text" placeholder="" value="'.( get_option( 'acBank_api_secret' ) ).'" style="" id="wpsc_options[acBank_api_secret]" name="wpsc_options[acBank_api_secret]" ></td>
         </tr>
                 <tr valign="top">
             <th >
-                <label for="acBank_al_username">'.__( 'Alligncommerce Account Username', 'wpsc' ).'</label></th>
+                <label for="acBank_al_username">'.__( 'Align Commerce Account Username', 'wpsc' ).'</label></th>
             <td ><input type="text" placeholder="" value="'.( get_option( 'acBank_al_username' ) ).'" style="" id="wpsc_options[acBank_al_username]" name="wpsc_options[acBank_al_username]" ></td>
         </tr>
                 <tr valign="top">
             <th >
-                <label for="acBank_al_password">'.__( 'Alligncommerce account password', 'wpsc' ).'</label></th>
+                <label for="acBank_al_password">'.__( 'Align Commerce account password', 'wpsc' ).'</label></th>
             <td ><input type="password" placeholder="" value="'.( get_option( 'acBank_al_password' ) ).'" style="" id="wpsc_options[acBank_al_password]" name="wpsc_options[acBank_al_password]" ></td>
         </tr><tr valign="top">
             <th >

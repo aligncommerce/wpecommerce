@@ -1,10 +1,10 @@
 <?php
   /*
-Plugin Name: Alligncommerce payment gateway
+Plugin Name: WP eCommerce - Accept Bitcoin and Payin Local Payment Gateway
 Plugin URI: https://aligncommerce.com
-Description: Add alligncommerce Payment Gateways for wp-eCommerce.
+Description: Add Align Commerce Payment Gateway for WP eCommerce.
 Version: 1.0.0
-Author: Align Commerce
+Author: Align Commerce Corporation
 Author URI: https://aligncommerce.com
 License: GPLv2
 */
@@ -150,7 +150,7 @@ function form_acBctpay() {
     {
         
        $output.='   <tr valign="top">
-            <th colspan="2">'.__( 'Gateway Disabled : Aligncommerce Bitcoin does not support your store currency OR you entered wrong credentials.', 'wpsc' ).'</th>
+            <th colspan="2">'.__( 'Gateway Disabled : Align Commerce Bitcoin does not support your store currency OR you entered wrong credentials.', 'wpsc' ).'</th>
            </tr>'; 
     }
     //else
@@ -163,21 +163,21 @@ function form_acBctpay() {
              </td>
         </tr>
                 <tr valign="top">
-            <th ><label for="acBtc_api_key">'.__( 'Alligncommerce API key', 'wpsc' ).'</label></th>
+            <th ><label for="acBtc_api_key">'.__( 'Align Commerce API key', 'wpsc' ).'</label></th>
             <td ><input type="text" placeholder="" value="'.( get_option( 'acBtc_api_key' ) ).'" style="" id="wpsc_options[acBtc_api_key]" name="wpsc_options[acBtc_api_key]" ></td>
         </tr>
                 <tr valign="top">
-            <th ><label for="acBtc_api_secret">'.__( 'Alligncommerce API Secret', 'wpsc' ).'</label></th>
+            <th ><label for="acBtc_api_secret">'.__( 'Align Commerce API Secret', 'wpsc' ).'</label></th>
             <td ><input type="text" placeholder="" value="'.( get_option( 'acBtc_api_secret' ) ).'" style="" id="wpsc_options[acBtc_api_secret]" name="wpsc_options[acBtc_api_secret]" ></td>
         </tr>
                 <tr valign="top">
             <th >
-                <label for="acBtc_al_username">'.__( 'Alligncommerce Account Username', 'wpsc' ).'</label></th>
+                <label for="acBtc_al_username">'.__( 'Align Commerce Account Username', 'wpsc' ).'</label></th>
             <td ><input type="text" placeholder="" value="'.( get_option( 'acBtc_al_username' ) ).'" style="" id="wpsc_options[acBtc_al_username]" name="wpsc_options[acBtc_al_username]" ></td>
         </tr>
                 <tr valign="top">
             <th >
-                <label for="acBtc_al_password">'.__( 'Alligncommerce account password', 'wpsc' ).'</label></th>
+                <label for="acBtc_al_password">'.__( 'Align Commerce account password', 'wpsc' ).'</label></th>
             <td ><input type="password" placeholder="" value="'.( get_option( 'acBtc_al_password' ) ).'" style="" id="wpsc_options[acBtc_al_password]" name="wpsc_options[acBtc_al_password]" ></td>
         </tr>
         <tr valign="top">
