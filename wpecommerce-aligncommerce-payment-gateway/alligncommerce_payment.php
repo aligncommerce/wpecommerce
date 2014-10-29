@@ -296,7 +296,7 @@ function checkout_acBctpay($seperator, $sessionid)
                 $i++;
       
     }
-    if($shipping_total>0)
+   /* if($shipping_total>0)
     {
         $productAry[]= array(
                     'product_name' => 'Total Shipping',
@@ -304,7 +304,8 @@ function checkout_acBctpay($seperator, $sessionid)
                     'quantity' => 1,
                     'product_shipping' => round($shipping_total,2));
     }
-    $tax=round($item->cart->total_tax,2);
+    $tax = wpsc_tax_isincluded() ? 0 : round($item->cart->total_tax,2);
+    // $tax=round($item->cart->total_tax,2);
     if($tax>0)
         {
         $productAry[]= array(
@@ -321,20 +322,63 @@ function checkout_acBctpay($seperator, $sessionid)
                     'product_price' => -($discount),
                     'quantity' => 1,
                     'product_shipping' => 0);
-        }
-
-
+        }*/
+       // debugbreak();
+        
+     $tax = wpsc_tax_isincluded() ? 0 : round($item->cart->total_tax,2);
+     $discount=round($wpsc_cart->coupons_amount,2);
+     //$countrylist = WPSC_Countries::get_countries_array( true, true );
+    
       $store_currency_data = WPSC_Countries::get_currency_data( get_option( 'currency_type' ), true );
       $cur_code=($store_currency_data['code']);  
      $invoice_post =  array(
                 'access_token' => $access_token,
                 'checkout_type' => 'btc',
-                 'order_id'=>$purchase_log['id'],
-                 //'currency'=>$cur_code,
-                 'currency_id'=>get_option('ac_currency_id_bit'),
+                'order_id'=>$purchase_log['id'],
+                //'currency'=>$cur_code,
+                'currency_id'=>get_option('ac_currency_id_bit'),
                 'products' => $productAry,
-                'buyer_info' => $acCustomer_details
-    );
+                'buyer_info' => array(
+                           'first_name' => $userinfo['billingfirstname'],
+                            'last_name' => $userinfo['billinglastname'],
+                            'email' => $userinfo['billingemail'],
+                            'address_1' => $userinfo['billingaddress'],
+                            'address_2' => '',
+                            'address_number' => "",
+                            'city' => $userinfo['billingcity'],
+                            'state' => $userinfo['billingstate'],
+                            'zip' => $userinfo['billingpostcode'],
+                            'country' => WPSC_Countries::get_country($userinfo['billingcountry'])->_name,
+                            'phone' => $userinfo['billingphone']),
+                'shipping' => array(
+                          'description' => 'Shipping',
+                          'amount' => round($shipping_total,2)
+                             ),
+                 'shipping_address' => array(
+                            'first_name' => $userinfo['shippingfirstname'],
+                            'last_name' => $userinfo['shippinglastname'],
+                            'email' => $userinfo['billingemail'],
+                            'address_1' => $userinfo['shippingaddress'],
+                            'address_2' => '',
+                            'address_number' => "",
+                            'city' => $userinfo['shippingcity'],
+                            'state' => $userinfo['shippingstate'],
+                            'zip' => $userinfo['shippingpostcode'],
+                            'country' => WPSC_Countries::get_country($userinfo['shippingcountry'])->_name,
+                            'phone' => $userinfo['billingphone'])
+        
+    ); 
+    if($tax>0)
+    {$invoice_post['tax_rate']=array(
+                  'description' => 'Tax',
+                  //'percent' => '',
+                  'amount' => $tax);}
+    if($discount>0){
+         $invoice_post['discount'] = array(
+                          'description' => 'Discount',
+                          //'percent_off' => '',
+                          'amount_off' => $discount);
+    }
    
      $acUser=get_option( 'acBtc_al_username' );
     $acPasword=get_option( 'acBtc_al_password' );
