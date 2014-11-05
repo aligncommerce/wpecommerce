@@ -11,6 +11,11 @@ License: GPLv2
 
 //register_activation_hook(__FILE__, "aligncom_payment_create");
 
+function ecommerce_btc_payment_fallback_notice() {
+    echo '<div class="error"><p>' . sprintf( __( 'eCommerce Alligncommerce Payment Gateways depends on the last version of %s to work!', 'wpsc' ), '<a href="http://wordpress.org/extend/plugins/wp-e-commerce/">WP eCommerce</a>' ) . '</p></div>';
+}
+
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 /**clear data when uninstall plugin******************/
 register_uninstall_hook(    __FILE__, 'uninstall_ac_paymentGateways_ecommerce' );
 function uninstall_ac_paymentGateways_ecommerce()
@@ -29,20 +34,20 @@ function uninstall_ac_paymentGateways_ecommerce()
     delete_option('acBank_ipn_url');
 }
 
-function ecommerce_btc_payment_fallback_notice() {
-    echo '<div class="error"><p>' . sprintf( __( 'eCommerce Alligncommerce Payment Gateways depends on the last version of %s to work!', 'wpsc' ), '<a href="http://wordpress.org/extend/plugins/wp-e-commerce/">WP eCommerce</a>' ) . '</p></div>';
-}
-
-if ( ! file_exists( WP_PLUGIN_DIR.'/wp-e-commerce/wpsc-includes/merchant.class.php' ) ) {
+//print_r(get_option('active_plugins'));
+if(!in_array('wp-e-commerce/wp-shopping-cart.php',get_option('active_plugins')))
+//if(!class_exists( 'wpsc_merchant' ))
+//if ( ! file_exists( WP_PLUGIN_DIR.'/wp-e-commerce/wpsc-includes/merchant.class.php' ) )
+ {
         add_action( 'admin_notices', 'ecommerce_btc_payment_fallback_notice' );
-        //$bct_plugin = plugin_dir_path( __FILE__ ).'/alligncommerce_payment.php';
-        //deactivate_plugins($bct_plugin);
-        //return;
+        $bct_plugin = plugin_dir_path( __FILE__ ).'/alligncommerce_payment.php';
+        deactivate_plugins($bct_plugin);
+        return;
     }
 
-else{
+else{ 
     require_once WP_PLUGIN_DIR.'/wp-e-commerce/wpsc-includes/merchant.class.php';
-$nzshpcrt_gateways[$num] = array(
+    $nzshpcrt_gateways[$num] = array(
     'name' => __( 'Aligncommerce Bitcoin Payment', 'wpsc' ),
     'api_version' => 1.0,
     'class_name' => 'wpsc_merchant_acbctpay',
@@ -62,7 +67,7 @@ if ( ! empty( $image ) ) {
 
 /***************Initialize payment gateway class*********/
 /*add_action( 'plugins_loaded', 'ac_bct_class_init' );
-function ac_bct_class_init()*/
+function ac_bct_class_init()*/  
 
 class wpsc_merchant_acbctpay extends wpsc_merchant {
 
