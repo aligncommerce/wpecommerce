@@ -16,7 +16,7 @@ The Align Commerce payment gateway for WP-eCommerce will allow you to accept pay
 - After generating the API keys, you need to set the IPN and Return Urls.
 - Set your return URL and IPN URL to the following format.
   * Return URL: http://yoursite.com/products-page/transaction-results/?acBankCallback=1
-  * IPN URL: http://yoursite.com
+  * IPN URL: http://yoursite.com/products-page/transaction-results/?acBankCallback=1
 - You will also need your Align Commerce dashboard email and password on your plugin settings
 
 # Installation
